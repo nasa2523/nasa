@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>导诊选项页面</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+  }
+  h1 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .option {
+    width: 80%;
+    max-width: 300px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: #40d6c2;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .option:hover {
+    background: #41c1f1;
+  }
+  .nav-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 300px;
+  }
+  .nav-buttons button {
+    padding: 0.8rem 1.5rem;
+    background: #888;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .nav-buttons button:hover {
+    background: #555;
+  }
+  #result {
+    margin-top: 2rem;
+    width: 90%;
+    max-width: 350px;
+    padding: 1rem;
+    background: #fff7e6;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    min-height: 50px;
+    font-size: 1rem;
+    line-height: 1.5;
+    word-break: break-word;
+    display: none; /* 默认隐藏 */
+  }
+</style>
+</head>
+<body>
+
+<h1 id="question">问题显示区</h1>
+<div id="options"></div>
+
+<div class="nav-buttons">
+  <button id="prevBtn">上一步</button>
+  <button id="nextBtn">下一步</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+let table = [
+{"id":1,"question":"不舒服的区域","option":"胸口","next_id":101,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"肚子","next_id":102,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"背","next_id":103,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"喉咙","next_id":104,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"头","next_id":105,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"肩膀","next_id":106,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"脖子","next_id":107,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"胳膊","next_id":108,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"手","next_id":109,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"腿","next_id":1010,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"脚","next_id":1011,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"脸","next_id":1012,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"臀部","next_id":1013,"result":"","note":""},
+{"id":1,"question":"不舒服的区域","option":"其他","next_id":1014,"result":"","note":""},
+
+{"id":101,"question":"胸口","option":"心口","next_id":10101,"result":"","note":""},
+{"id":101,"question":"胸口","option":"心口","next_id":10102,"result":"","note":""},
+{"id":101,"question":"胸口","option":"心口","next_id":10103,"result":"","note":""},
+{"id":101,"question":"胸口","option":"胸肋（会感觉不舒服的地方更深）","next_id":10104,"result":"","note":""},
+{"id":101,"question":"胸口","option":"胸肋（会感觉不舒服的地方更深）","next_id":10105,"result":"","note":""},
+{"id":101,"question":"胸口","option":"胸肋（会感觉不舒服的地方更深）","next_id":10106,"result":"","note":""},
+
+{"id":10101,"question":"心口","option":"左胸","next_id":null,"result":"","note":""},
+{"id":10102,"question":"心口","option":"右胸","next_id":null,"result":"","note":""},
+{"id":10103,"question":"心口","option":"正中（两乳头中间）","next_id":null,"result":"","note":""},
+{"id":10104,"question":"胸肋（会感觉不舒服的地方更深）","option":"左肋下","next_id":null,"result":"","note":""},
+{"id":10105,"question":"胸肋（会感觉不舒服的地方更深）","option":"右肋下","next_id":null,"result":"","note":""},
+{"id":10106,"question":"胸肋（会感觉不舒服的地方更深）","option":"胸骨正中","next_id":null,"result":"","note":""},
+
+{"id":102,"question":"肚子","option":"肚子上部（接近胸口）","next_id":10201,"result":"","note":""},
+{"id":102,"question":"肚子","option":"肚子中间（肚脐周边）","next_id":10202,"result":"","note":""},
+{"id":102,"question":"肚子","option":"肚子下部","next_id":10203,"result":"","note":""},
+
+{"id":10201,"question":"肚子上部（接近胸口）","option":"中间","next_id":null,"result":"","note":""},
+{"id":10201,"question":"肚子上部（接近胸口）","option":"左边（胃）","next_id":null,"result":"","note":""},
+{"id":10201,"question":"肚子上部（接近胸口）","option":"右边","next_id":null,"result":"","note":""},
+
+{"id":10202,"question":"肚子中间（肚脐周边）","option":"肚脐上方","next_id":null,"result":"","note":""},
+{"id":10202,"question":"肚子中间（肚脐周边）","option":"肚脐下方","next_id":null,"result":"","note":""},
+{"id":10202,"question":"肚子中间（肚脐周边）","option":"肚脐左边","next_id":null,"result":"","note":""},
+{"id":10202,"question":"肚子中间（肚脐周边）","option":"肚脐右边","next_id":null,"result":"","note":""},
+
+{"id":10203,"question":"肚子下部","option":"小肚子正中","next_id":null,"result":"","note":""},
+{"id":10203,"question":"肚子下部","option":"小肚子右侧","next_id":null,"result":"","note":""},
+{"id":10203,"question":"肚子下部","option":"小肚子左侧","next_id":null,"result":"","note":""},
+
+{"id":103,"question":"背","option":"上背","next_id":10301,"result":"","note":""},
+{"id":103,"question":"背","option":"下背（腰）","next_id":10302,"result":"","note":""},
+
+{"id":10301,"question":"上背","option":"左肩下方","next_id":null,"result":"","note":""},
+{"id":10301,"question":"上背","option":"右肩下方","next_id":null,"result":"","note":""},
+{"id":10301,"question":"上背","option":"中间（脊梁骨）","next_id":null,"result":"","note":""},
+{"id":10302,"question":"下背（腰）","option":"左腰","next_id":null,"result":"","note":""},
+{"id":10302,"question":"下背（腰）","option":"右腰","next_id":null,"result":"","note":""},
+{"id":10302,"question":"下背（腰）","option":"正中（脊梁骨下部）","next_id":null,"result":"","note":""},
+
+{"id":104,"question":"喉咙","option":"嗓子","next_id":10401,"result":"","note":""},
+{"id":104,"question":"喉咙","option":"脖子前","next_id":10402,"result":"","note":""},
+
+{"id":10401,"question":"嗓子","option":"嗓子眼","next_id":null,"result":"","note":""},
+{"id":10401,"question":"嗓子","option":"嗓子左边","next_id":null,"result":"","note":""},
+{"id":10401,"question":"嗓子","option":"嗓子右边","next_id":null,"result":"","note":""},
+
+{"id":10402,"question":"脖子前","option":"左边","next_id":null,"result":"","note":""},
+{"id":10402,"question":"脖子前","option":"中间","next_id":null,"result":"","note":""},
+{"id":10402,"question":"脖子前","option":"右边","next_id":null,"result":"","note":""},
+{"id":10402,"question":"脖子前","option":"锁骨窝左","next_id":null,"result":"","note":""},
+{"id":10402,"question":"脖子前","option":"锁骨窝中","next_id":null,"result":"","note":""},
+{"id":10402,"question":"脖子前","option":"锁骨窝右","next_id":null,"result":"","note":""},
+
+{"id":105,"question":"头","option":"头顶","next_id":10501,"result":"","note":""},
+{"id":105,"question":"头","option":"正面","next_id":10502,"result":"","note":""},
+{"id":105,"question":"头","option":"背面","next_id":10503,"result":"","note":""},
+{"id":105,"question":"头","option":"头皮","next_id":10504,"result":"","note":""},
+
+{"id":10501,"question":"头顶","option":"正中","next_id":null,"result":"","note":""},
+{"id":10501,"question":"头顶","option":"左边","next_id":null,"result":"","note":""},
+{"id":10501,"question":"头顶","option":"右边","next_id":null,"result":"","note":""},
+
+{"id":10502,"question":"正面","option":"脑门","next_id":null,"result":"","note":""},
+{"id":10502,"question":"正面","option":"左太阳穴","next_id":null,"result":"","note":""},
+{"id":10502,"question":"正面","option":"右太阳穴","next_id":null,"result":"","note":""},
+
+{"id":10503,"question":"背面","option":"脖子根上部","next_id":null,"result":"","note":""},
+{"id":10503,"question":"背面","option":"后脑勺","next_id":null,"result":"","note":""},
+{"id":10503,"question":"背面","option":"后脑上部","next_id":null,"result":"","note":""},
+
+{"id":10504,"question":"头皮","option":"头顶","next_id":null,"result":"","note":""},
+{"id":10504,"question":"头皮","option":"左边","next_id":null,"result":"","note":""},
+{"id":10504,"question":"头皮","option":"右边","next_id":null,"result":"","note":""},
+{"id":10504,"question":"头皮","option":"后面","next_id":null,"result":"","note":""}
+
+]
+
+let currentId = 1;
+let historyStack = [];
+let selectedPath = [];
+
+function showQuestion(id){
+  const rows = table.filter(r => r.id === id);
+  if(rows.length === 0) return;
+
+  document.getElementById("question").style.display = "block";
+  document.getElementById("options").style.display = "block";
+  document.querySelector(".nav-buttons").style.display = "flex";
+  document.getElementById("result").style.display = "none";
+
+  document.getElementById("question").innerText = rows[0].question;
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+
+  rows.forEach(row => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerText = row.option;
+    div.onclick = () => {
+      historyStack.push(currentId);
+      selectedPath.push(row.option);
+      if(row.next_id){
+        currentId = row.next_id;
+        showQuestion(currentId);
+      } else {
+        // 隐藏问题和选项
+        document.getElementById("question").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.querySelector(".nav-buttons").style.display = "none";
+
+        const resultDiv = document.getElementById("result");
+        resultDiv.style.display = "block";
+        resultDiv.innerText = "问诊结束！完整选择路径：\n" + selectedPath.join(" → ");
+      }
+    };
+    box.appendChild(div);
+  });
+}
+
+// 上一步按钮
+document.getElementById("prevBtn").onclick = () => {
+  if(historyStack.length > 0){
+    currentId = historyStack.pop();
+    selectedPath.pop();
+    showQuestion(currentId);
+  } else {
+    alert("已经是第一题");
+  }
+};
+
+// 下一步按钮（自动跳第一条 next_id）
+document.getElementById("nextBtn").onclick = () => {
+  const rows = table.filter(r => r.id === currentId && r.next_id);
+  if(rows.length > 0){
+    historyStack.push(currentId);
+    selectedPath.push(rows[0].option);
+    currentId = rows[0].next_id;
+    showQuestion(currentId);
+  } else {
+    alert("没有下一题");
+  }
+};
+// 如果选项多于4个，显示三列
+  if(rows.length > 4){
+    box.style.gridTemplateColumns = "repeat(3, 1fr)";
+  } else {
+    box.style.gridTemplateColumns = "1fr";
+  }
+
+  rows.forEach(row => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerText = row.option;
+    div.onclick = () => {
+      if(row.next_id){
+        showQuestion(row.next_id);
+      } else {
+        box.innerHTML = ""; // 清空选项
+        resultDiv.innerText = "问诊结束，推荐结果：" + row.option;
+      }
+    }
+    box.appendChild(div);
+  });
+}
+// 初始化显示第一题
+showQuestion(currentId);
+</script>
+
+</body>
+</html>
